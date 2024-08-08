@@ -1,29 +1,25 @@
 package com.example.video_chat_backend;
 
-
+import com.corundumstudio.socketio.SocketIOServer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+public class WebSocketConfig {
+
+    @Value("${socket.host}")
+    private String host;
+
+    @Value("${socket.port}")
+    private int port;
 
     @Bean
-    public VideoChatHandler videoChatHandler() {
-        return new VideoChatHandler();
-    }
-
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(videoChatHandler(), "/video-chat").setAllowedOrigins("*");
-    }
-
-    @Bean
-    public ServerEndpointExporter serverEndpointExporter() {
-        return new ServerEndpointExporter();
+    public SocketIOServer socketIOServer() throws Exception {
+        com.corundumstudio.socketio.Configuration config =
+                new com.corundumstudio.socketio.Configuration();
+        config.setHostname(host);
+        config.setPort(port);
+        return new SocketIOServer(config);
     }
 }
